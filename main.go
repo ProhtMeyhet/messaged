@@ -29,13 +29,11 @@ func main() {
 	case EMPTY:
 		flags.usage()
 		os.Exit(1)
-	case "tcpssl":
-		serverConfig := getTcpConfig(flags)
-		serverConfig.SetSSL(flags.CertificateFile, flags.KeyFile)
-		server := libmessage.NewTcpPlainServer(serverConfig)
-		runServer(flags.Threads, server, handler)
 	case "tcp":
 		serverConfig := getTcpConfig(flags)
+		if !flags.NoSSL {
+			serverConfig.SetSSL(flags.CertificateFile, flags.KeyFile)
+		}
 		server := libmessage.NewTcpPlainServer(serverConfig)
 		runServer(flags.Threads, server, handler)
 	case "androidpn":
@@ -56,18 +54,18 @@ func send(messenger libmessage.SendMessageInterface,
 }
 
 func runServer(threads int,
-		reciever libmessage.RecieveMessageInterface,
+		receiver libmessage.RecieveMessageInterface,
 		handler libmessage.SendMessageInterface) {
-	e := reciever.StartService()
+	e := receiver.StartService()
 	if e != nil {
 		fmt.Println("Error: " + e.Error())
 		os.Exit(11)
 	}
 
-	go reciever.Receive()
+	go receiver.Receive()
 
 	for i := 0; i <= threads; i++ {
-		go handleMessage(reciever.GetMessage(), handler)
+		go handleMessage(receiver.GetMessage(), handler)
 	}
 }
 

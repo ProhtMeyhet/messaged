@@ -11,6 +11,7 @@ const EMPTY = ""
 type flagConfig struct {
 	Type, Handler, CertificateFile, KeyFile string
 	MaxProcs, Threads, Port int
+	NoSSL bool
 }
 
 func NewFlagConfig() *flagConfig {
@@ -18,8 +19,9 @@ func NewFlagConfig() *flagConfig {
 }
 
 func (flags *flagConfig) parse() {
-	flag.StringVar(&flags.Type, "type", "tcpssl", "Server type (tcpssl, tcp, [dbus not implemented])")
-	flag.StringVar(&flags.Handler, "handler", "notify", "Message Handler (notify)")
+	flag.StringVar(&flags.Type, "type", "tcp", "Server type (tcp, xmppandroidpn, [dbus not implemented])")
+	flag.BoolVar(&flags.NoSSL, "no-ssl", false, "disable SSL encryption")
+	flag.StringVar(&flags.Handler, "handler", "notify", "Message Handler (notify, stdout)")
 	flag.IntVar(&flags.MaxProcs, "maxprocs", 5, "set runtime.GOMAXPROCS")
 	flag.IntVar(&flags.Threads, "threads", 5, "number of threads to run")
 	flag.StringVar(&flags.CertificateFile, "cert", "cert.pem", "ssl certificate file")
