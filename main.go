@@ -30,18 +30,18 @@ func main() {
 		flags.usage()
 		os.Exit(1)
 	case "tcpssl":
-		serverConfig := libmessage.NewTcpServerConfig()
+		serverConfig := getTcpConfig(flags)
 		serverConfig.SetSSL(flags.CertificateFile, flags.KeyFile)
 		server := libmessage.NewTcpPlainServer(serverConfig)
 		runServer(flags.Threads, server, handler)
 	case "tcp":
-		serverConfig := libmessage.NewTcpServerConfig()
+		serverConfig := getTcpConfig(flags)
 		server := libmessage.NewTcpPlainServer(serverConfig)
 		runServer(flags.Threads, server, handler)
 	case "androidpn":
 		fallthrough
 	case "xmppandroidpn":
-		serverConfig := libmessage.NewTcpServerConfig()
+		serverConfig := getTcpConfig(flags)
 		server := libmessage.NewXmppAndroidpnServer(serverConfig)
 		runServer(flags.Threads, server, handler)
 	}
@@ -81,6 +81,14 @@ func handleMessage(messageChannel chan *libmessage.Message,
 				send(handler, message, to)
 		}
 	}
+}
+
+func getTcpConfig(flags *flagConfig) *libmessage.TcpServerConfig {
+	config := libmessage.NewTcpServerConfig()
+
+	config.Port = flags.Port
+
+	return config
 }
 
 func handleSignals() {
